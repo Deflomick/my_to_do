@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:my_to_do/constants/colors.dart';
+
+import '../constants/colors.dart';
+import '../model/todo.dart';
+import '../widgets/todo_item.dart';
 
 class Home extends StatelessWidget {
-  const Home({Key? key}) : super(key: key);
+   Home({Key? key}) : super(key: key);
+
+  final todoList=ToDo.todoList();
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -10,20 +17,26 @@ class Home extends StatelessWidget {
       backgroundColor: tdBgColor,
       appBar: _buildAppBar(),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 15),,
+        padding: EdgeInsets.symmetric(horizontal: 15),
         child: Column(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.circular(20),
+            searchBox(),
+            Expanded(
+              child: ListView(
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(top: 0,bottom: 15),
+                    child: Text('Tutte le note',style: TextStyle(
+                      fontSize: 50,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    ),
+                  ),
+                  for( ToDo todo in todoList)
+                  ToDoItem(todo: todo, ),
 
-              ),
-              child: TextField(
-              decoration: InputDecoration(
-              contentPadding: EdgeInsets.all(15),
-              prefixIcon: Icon(Icons.search,color: tdBlack,)
-              ),
+
+                ],
               ),
             )
           ],
@@ -55,6 +68,34 @@ class Home extends StatelessWidget {
       ]),
     );
 
+  }
+
+  Widget searchBox() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey,
+        borderRadius: BorderRadius.circular(20),
+
+      ),
+      child: TextField(
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(0),
+          prefixIcon: Icon(
+            Icons.search,
+            color: tdBlack,
+            size: 15,
+
+          ),
+          prefixIconConstraints: BoxConstraints(
+            maxHeight: 15,
+            minWidth: 15,
+          ),
+          border: InputBorder.none,
+          hintText: 'Cerca',
+          hintStyle: TextStyle(color: Colors.white54),
+        ),
+      ),
+    );
   }
 
 
