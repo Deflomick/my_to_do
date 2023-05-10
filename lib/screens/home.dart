@@ -1,9 +1,111 @@
 import 'package:flutter/material.dart';
+import 'package:my_to_do/widgets/dialog_box.dart';
 
 import '../model/todo.dart';
 import '../constants/colors.dart';
 import '../widgets/todo_item.dart';
 
+class Homepage extends StatefulWidget {
+  const Homepage({Key? key}) : super(key: key);
+
+  @override
+  State<Homepage> createState() => _HomepageState();
+}
+
+class _HomepageState extends State<Homepage> {
+
+  final _controller=TextEditingController();
+
+  //lista di note
+
+  List toDoList=[
+    ['Esempio di appunto ',
+    false],
+    ['Secondo esempio di appunto' ,
+    true],
+  ];
+
+  void deleteTask(int index){
+     setState(() {
+       toDoList.removeAt(index);
+     });
+
+}
+
+  void checkBoxChanged(bool? value , int index){
+    setState(() {
+      toDoList[index][1] = !toDoList[index][1];
+    });
+
+  }
+  void createNewTask() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return DialogBox(
+          controller: _controller, onCancel: ()=>Navigator.of(context).pop(), onSave: saveNewTask,
+
+
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.yellow[200],
+      appBar:AppBar(
+        title: Text('Appunti'),
+        elevation: 0,
+
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed:createNewTask,
+
+
+        child: Icon(Icons.add),
+      ),
+      body: ListView.builder(
+        itemBuilder: (context,index){
+          return ToDoItem(
+              taskName: toDoList[index][0],
+              taskCompleted: toDoList[index][1],
+              onChanged: (value)=> checkBoxChanged(
+                value,
+                index,
+              ),
+            deleteFunction: (context)=> deleteTask(index),
+          );
+        },
+        itemCount: toDoList.length,)
+
+
+          );
+
+  }
+
+
+
+  void saveNewTask() {
+    setState(() {
+      toDoList.add([_controller.text,false,]);
+      _controller.clear();
+    });
+    Navigator.of(context).pop();
+  }
+}
+
+
+
+
+
+
+
+
+
+//VERSION 0.1
+/*
 class Home extends StatefulWidget {
   Home({Key? key}) : super(key: key);
 
@@ -217,3 +319,4 @@ class _HomeState extends State<Home> {
     );
   }
 }
+*/
