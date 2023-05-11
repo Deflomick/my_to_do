@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:my_to_do/data/database.dart';
 import 'package:my_to_do/widgets/dialog_box.dart';
 
 import '../model/todo.dart';
@@ -13,29 +15,44 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
+  // reference the hive box
+  final _myBox=Hive.box('mybox');
+  ToDoDataBase db = ToDoDataBase();
+
+  @override
+  void initState() {
+    // if this is the 1st time ever opening the app create default data
+    if(_myBox.get('TODOLIST')  ==null){
+      db.createInitialData();
+    }else{
+      //already exist data
+      db.loadDataBase();
+    }
+
+
+    super.initState();
+  }
+
+
 
   final _controller=TextEditingController();
 
-  //lista di note
 
-  List toDoList=[
-    ['Esempio di appunto ',
-    false],
-    ['Secondo esempio di appunto' ,
-    true],
-  ];
+
 
   void deleteTask(int index){
      setState(() {
-       toDoList.removeAt(index);
+       db.toDoList.removeAt(index);
      });
+     db.updateDataBase();
 
 }
-
+  // checkbox was tapped
   void checkBoxChanged(bool? value , int index){
     setState(() {
-      toDoList[index][1] = !toDoList[index][1];
+      db.toDoList[index][1] = !db.toDoList[index][1];
     });
+    db.updateDataBase();
 
   }
   void createNewTask() {
@@ -49,6 +66,14 @@ class _HomepageState extends State<Homepage> {
         );
       },
     );
+  }
+  void saveNewTask() {
+    setState(() {
+      db.toDoList.add([_controller.text,false,]);
+      _controller.clear();
+    });
+    Navigator.of(context).pop();
+    db.updateDataBase();
   }
 
   @override
@@ -69,8 +94,8 @@ class _HomepageState extends State<Homepage> {
       body: ListView.builder(
         itemBuilder: (context,index){
           return ToDoItem(
-              taskName: toDoList[index][0],
-              taskCompleted: toDoList[index][1],
+              taskName: db.toDoList[index][0],
+              taskCompleted: db.toDoList[index][1],
               onChanged: (value)=> checkBoxChanged(
                 value,
                 index,
@@ -78,7 +103,7 @@ class _HomepageState extends State<Homepage> {
             deleteFunction: (context)=> deleteTask(index),
           );
         },
-        itemCount: toDoList.length,)
+        itemCount: db.toDoList.length,)
 
 
           );
@@ -87,13 +112,7 @@ class _HomepageState extends State<Homepage> {
 
 
 
-  void saveNewTask() {
-    setState(() {
-      toDoList.add([_controller.text,false,]);
-      _controller.clear();
-    });
-    Navigator.of(context).pop();
-  }
+
 }
 
 
